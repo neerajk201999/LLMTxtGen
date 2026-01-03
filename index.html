@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GEO LLMs.txt Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49',
+            },
+            mosaic: {
+              bg: 'var(--mosaic-bg)',
+              tile: 'var(--mosaic-tile)',
+              border: 'var(--mosaic-border)',
+            }
+          },
+          backgroundImage: {
+            'grid-pattern': "linear-gradient(to right, var(--grid-color) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px)",
+          },
+          backgroundSize: {
+            'grid-pattern': '40px 40px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --mosaic-bg: #f1f5f9;
+      /* slate-100 */
+      --mosaic-tile: #ffffff;
+      /* white */
+      --mosaic-border: #cbd5e1;
+      /* slate-300 */
+      --grid-color: rgba(148, 163, 184, 0.15);
+      /* slate-400, low opacity */
+      --scrollbar-thumb: #cbd5e1;
+      --scrollbar-thumb-hover: #94a3b8;
+    }
+
+    .dark {
+      --mosaic-bg: #020617;
+      /* slate-950 */
+      --mosaic-tile: #0f172a;
+      /* slate-900 */
+      --mosaic-border: #1e293b;
+      /* slate-800 */
+      --grid-color: rgba(30, 41, 59, 0.3);
+      --scrollbar-thumb: #334155;
+      --scrollbar-thumb-hover: #475569;
+    }
+
+    body {
+      background-color: var(--mosaic-bg);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Subtle grid background */
+    .bg-mosaic-grid {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+    }
+
+    /* Custom scrollbar for code blocks */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 0px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: var(--scrollbar-thumb-hover);
+    }
+  </style>
+
+</head>
+
+<body class="bg-mosaic-bg text-slate-900 dark:text-slate-100 antialiased min-h-screen selection:bg-brand-500/30">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>

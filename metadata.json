@@ -1,0 +1,5 @@
+{
+  "name": "GEO LLMs.txt Generator",
+  "description": "Generate professional llms.txt files for your website using Gemini Search Grounding and GEO principles.",
+  "requestFramePermissions": []
+}
