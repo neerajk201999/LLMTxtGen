@@ -24,7 +24,9 @@ app.get('/api/health', (req, res) => {
 
 // API Route
 app.post('/api/generate', async (req, res) => {
+    console.log("Received /api/generate request");
     const { url } = req.body;
+    console.log(`Processing URL: ${url}`);
 
     if (!url) {
         return res.status(400).json({ error: 'URL is required' });
@@ -45,6 +47,16 @@ app.post('/api/generate', async (req, res) => {
       Target Website: ${url}
       Clean Domain: ${cleanUrl}
       Current Date: ${today}
+
+      SEARCH PROTOCOL (MANDATORY)
+      To ensure the output is the "Source of Truth", you must:
+      1. Use the googleSearch tool to explore the domain.
+      2. Perform specific searches for:
+         - "site:${cleanUrl} features"
+         - "site:${cleanUrl} documentation"
+         - "site:${cleanUrl} pricing"
+         - "site:${cleanUrl} api"
+      3. Verify every claim against the retrieved content.
 
       ROLE
       You are the "Strategic AI Brand Architect & GEO Specialist." Your purpose is to transform raw website data into the industry-leading llms.txt standard. Your output is the "Source of Truth" for LLMs.
@@ -76,8 +88,10 @@ app.post('/api/generate', async (req, res) => {
       Ensure the output is valid Markdown.
     `;
 
+        console.log("Starting generation...");
         const generateWithRetry = async (retryCount = 0) => {
             try {
+                console.log(`Attempt ${retryCount + 1}...`);
                 return await ai.models.generateContent({
                     model: 'gemini-2.5-flash',
                     contents: prompt,
@@ -88,6 +102,7 @@ app.post('/api/generate', async (req, res) => {
                     },
                 });
             } catch (error) {
+                console.error(`Attempt ${retryCount + 1} failed:`, error.message);
                 if (error.status === 429 && retryCount < 3) {
                     const delay = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s
                     console.log(`Rate limit hit. Retrying in ${delay}ms...`);
@@ -99,6 +114,7 @@ app.post('/api/generate', async (req, res) => {
         };
 
         const response = await generateWithRetry();
+        console.log("Generation successful.");
 
         let text = response.text || "No content generated.";
 
