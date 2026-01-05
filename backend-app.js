@@ -49,14 +49,9 @@ app.post('/api/generate', async (req, res) => {
       Current Date: ${today}
 
       SEARCH PROTOCOL (MANDATORY)
-      To ensure the output is the "Source of Truth", you must:
-      1. Use the googleSearch tool to explore the domain.
-      2. Perform specific searches for:
-         - "site:${cleanUrl} features"
-         - "site:${cleanUrl} documentation"
-         - "site:${cleanUrl} pricing"
-         - "site:${cleanUrl} api"
-      3. Verify every claim against the retrieved content.
+      To ensure the output is the "Source of Truth":
+      1. Use the googleSearch tool to explore the ${cleanUrl} domain for features, documentation, pricing, and API details.
+      2. Verify major claims against retrieved content.
 
       ROLE
       You are the "Strategic AI Brand Architect & GEO Specialist." Your purpose is to transform raw website data into the industry-leading llms.txt standard. Your output is the "Source of Truth" for LLMs.
@@ -99,6 +94,12 @@ app.post('/api/generate', async (req, res) => {
                         tools: [{ googleSearch: {} }],
                         maxOutputTokens: 8192,
                         temperature: 0.1,
+                        safetySettings: [
+                            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+                            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+                            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+                            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+                        ]
                     },
                 });
             } catch (error) {
@@ -116,7 +117,23 @@ app.post('/api/generate', async (req, res) => {
         const response = await generateWithRetry();
         console.log("Generation successful.");
 
-        let text = response.text || "No content generated.";
+        // Robust text extraction
+        let text = "";
+        if (response.candidates && response.candidates.length > 0) {
+            const candidate = response.candidates[0];
+            if (candidate.content && candidate.content.parts) {
+                text = candidate.content.parts.map(part => part.text || "").join("");
+            }
+        }
+
+        // Fallback to helper if manual extraction failed (unlikely)
+        if (!text && typeof response.text === 'function') {
+            try { text = response.text(); } catch (e) { console.error("Helper text() failed", e); }
+        } else if (!text && response.text) {
+            text = response.text;
+        }
+
+        text = text || "No content generated. (Parsed empty response)";
 
         // Clean up code fences
         text = text.trim();
