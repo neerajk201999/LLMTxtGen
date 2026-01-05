@@ -10,12 +10,21 @@ export const generateLLMsTxt = async (url: string): Promise<GenerationResult> =>
       body: JSON.stringify({ url }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to generate content');
+    const responseText = await response.text();
+    let data;
+
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      // If response is not JSON, throw with the text body
+      throw new Error(`API Request Failed: ${response.status} ${response.statusText} - ${responseText.slice(0, 100)}`);
     }
 
-    return await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to generate content');
+    }
+
+    return data;
   } catch (error) {
     console.error("API Error:", error);
     throw error;
