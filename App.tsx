@@ -61,10 +61,10 @@ const App: React.FC = () => {
           // Slow down as we get closer to 95%
           if (prev >= 95) return 95;
           // Variable increment to look organic, calibrated for ~45-60s
-          const increment = Math.random() * 1.5; 
+          const increment = Math.random() * 1.5;
           return Math.min(prev + increment, 95);
         });
-      }, 500); 
+      }, 500);
     } else if (status === GenerationStatus.SUCCESS) {
       setProgress(100);
     } else if (status === GenerationStatus.IDLE) {
@@ -101,7 +101,7 @@ const App: React.FC = () => {
       if (!/^https?:\/\//i.test(targetUrl)) {
         targetUrl = 'https://' + targetUrl;
       }
-      
+
       const data = await generateLLMsTxt(targetUrl);
       setResult(data);
       setStatus(GenerationStatus.SUCCESS);
@@ -119,9 +119,9 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-mosaic-bg bg-mosaic-grid text-slate-900 dark:text-white p-4 md:p-6 lg:p-8 flex flex-col items-center transition-colors duration-300">
-      
+
       {/* Theme Toggle */}
-      <button 
+      <button
         onClick={toggleTheme}
         className="fixed top-4 right-4 z-50 p-2 rounded-full bg-mosaic-tile border border-mosaic-border text-slate-500 hover:text-brand-500 shadow-lg transition-all"
         title="Toggle Theme"
@@ -131,7 +131,7 @@ const App: React.FC = () => {
 
       {/* Main Mosaic Container */}
       <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-4 auto-rows-min">
-        
+
         {/* Title Tile - Spans 8 cols */}
         <div className="col-span-1 md:col-span-8 bg-mosaic-tile border border-mosaic-border p-6 md:p-8 rounded-sm relative overflow-hidden group transition-colors duration-300">
           <div className="absolute top-0 right-0 p-4 opacity-5 dark:opacity-10 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity">
@@ -140,9 +140,9 @@ const App: React.FC = () => {
           <div className="relative z-10 flex flex-col justify-between h-full">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                 <span className="text-xs font-mono text-brand-600 dark:text-brand-400 tracking-widest">
-                    A product by <a href="https://system2.co" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-500 transition-colors">system2.co</a>
-                 </span>
+                <span className="text-xs font-mono text-brand-600 dark:text-brand-400 tracking-widest">
+                  A product by <a href="https://system2.co" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-500 transition-colors">system2.co</a>
+                </span>
               </div>
               <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-slate-900 dark:text-white mb-2">
                 LLMs.txt <span className="text-slate-400 dark:text-slate-500">Architect</span>
@@ -156,95 +156,95 @@ const App: React.FC = () => {
 
         {/* System Status Tile - Spans 4 cols */}
         <div className="col-span-1 md:col-span-4 bg-mosaic-tile border border-mosaic-border p-6 rounded-sm flex flex-col justify-between relative overflow-hidden h-full min-h-[160px] transition-colors duration-300">
-           <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 to-transparent dark:from-brand-900/10"></div>
-           
-           <div className="relative z-10 w-full">
-              <div className="flex items-center justify-between mb-4">
-                 <div className="flex items-center gap-2">
-                   <Globe className="w-5 h-5 text-brand-600 dark:text-brand-400" />
-                   <span className="font-mono text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">System Status</span>
-                 </div>
-                 <div className="flex items-center gap-2">
-                   {status === GenerationStatus.LOADING && (
-                     <span className="font-mono text-xs text-brand-500 animate-pulse">{formatTime(elapsedTime)}</span>
-                   )}
-                   <div className={`w-2 h-2 rounded-full ${status === GenerationStatus.LOADING ? 'bg-brand-500 animate-pulse' : status === GenerationStatus.SUCCESS ? 'bg-green-500' : 'bg-slate-400 dark:bg-slate-600'}`}></div>
-                 </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 to-transparent dark:from-brand-900/10"></div>
+
+          <div className="relative z-10 w-full">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+                <span className="font-mono text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">System Status</span>
               </div>
-
-              {/* Dynamic Status Content */}
-              <div className="space-y-4">
-                {status === GenerationStatus.IDLE && (
-                   <div className="text-slate-500 dark:text-slate-400 text-sm font-mono">Ready for deep analysis...</div>
-                )}
-
+              <div className="flex items-center gap-2">
                 {status === GenerationStatus.LOADING && (
-                  <div className="space-y-3">
-                    <div className="text-slate-900 dark:text-white text-lg font-bold animate-pulse leading-tight">
-                      {LOADING_MESSAGES[loadingMsgIndex]}
-                    </div>
-                    {/* Progress Bar Container */}
-                    <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden relative">
-                      <div 
-                        className="h-full bg-brand-500 transition-all duration-500 ease-out rounded-full"
-                        style={{ width: `${progress}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-brand-600 dark:text-brand-400 uppercase">
-                      <span>Est. Time: ~45s</span>
-                      <div className="flex items-center gap-1">
-                        <span className="font-bold">{Math.round(progress)}%</span>
-                      </div>
-                    </div>
-                  </div>
+                  <span className="font-mono text-xs text-brand-500 animate-pulse">{formatTime(elapsedTime)}</span>
                 )}
-
-                {status === GenerationStatus.SUCCESS && result?.usageMetadata && (
-                  <div className="space-y-3">
-                     <div className="text-slate-900 dark:text-white text-sm font-semibold flex items-center gap-2">
-                        <Database className="w-4 h-4 text-green-600 dark:text-green-500" />
-                        <span>Generation Complete in {formatTime(elapsedTime)}</span>
-                     </div>
-                     
-                     <div className="grid grid-cols-3 gap-2 mt-2">
-                        <div className="bg-slate-100 dark:bg-slate-900/50 p-2 rounded-sm border border-slate-200 dark:border-slate-800">
-                           <div className="text-[10px] text-slate-500 font-mono uppercase mb-1">Input</div>
-                           <div className="text-xs font-mono text-slate-700 dark:text-white">{result.usageMetadata.promptTokenCount.toLocaleString()}</div>
-                        </div>
-                        <div className="bg-slate-100 dark:bg-slate-900/50 p-2 rounded-sm border border-slate-200 dark:border-slate-800">
-                           <div className="text-[10px] text-slate-500 font-mono uppercase mb-1">Output</div>
-                           <div className="text-xs font-mono text-brand-600 dark:text-brand-300">{result.usageMetadata.candidatesTokenCount.toLocaleString()}</div>
-                        </div>
-                         <div className="bg-slate-100 dark:bg-slate-900/50 p-2 rounded-sm border border-slate-200 dark:border-slate-800">
-                           <div className="text-[10px] text-slate-500 font-mono uppercase mb-1">Total</div>
-                           <div className="text-xs font-mono text-slate-700 dark:text-white font-bold">{result.usageMetadata.totalTokenCount.toLocaleString()}</div>
-                        </div>
-                     </div>
-                  </div>
-                )}
-
-                {status === GenerationStatus.ERROR && (
-                   <div className="text-red-500 dark:text-red-400 text-sm font-mono">Process Failed</div>
-                )}
+                <div className={`w-2 h-2 rounded-full ${status === GenerationStatus.LOADING ? 'bg-brand-500 animate-pulse' : status === GenerationStatus.SUCCESS ? 'bg-green-500' : 'bg-slate-400 dark:bg-slate-600'}`}></div>
               </div>
-           </div>
+            </div>
+
+            {/* Dynamic Status Content */}
+            <div className="space-y-4">
+              {status === GenerationStatus.IDLE && (
+                <div className="text-slate-500 dark:text-slate-400 text-sm font-mono">Ready for deep analysis...</div>
+              )}
+
+              {status === GenerationStatus.LOADING && (
+                <div className="space-y-3">
+                  <div className="text-slate-900 dark:text-white text-lg font-bold animate-pulse leading-tight">
+                    {LOADING_MESSAGES[loadingMsgIndex]}
+                  </div>
+                  {/* Progress Bar Container */}
+                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden relative">
+                    <div
+                      className="h-full bg-brand-500 transition-all duration-500 ease-out rounded-full"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] font-mono text-brand-600 dark:text-brand-400 uppercase">
+                    <span>Est. Time: ~30-60s (Deep Search Active)</span>
+                    <div className="flex items-center gap-1">
+                      <span className="font-bold">{Math.round(progress)}%</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {status === GenerationStatus.SUCCESS && result?.usageMetadata && (
+                <div className="space-y-3">
+                  <div className="text-slate-900 dark:text-white text-sm font-semibold flex items-center gap-2">
+                    <Database className="w-4 h-4 text-green-600 dark:text-green-500" />
+                    <span>Generation Complete in {formatTime(elapsedTime)}</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    <div className="bg-slate-100 dark:bg-slate-900/50 p-2 rounded-sm border border-slate-200 dark:border-slate-800">
+                      <div className="text-[10px] text-slate-500 font-mono uppercase mb-1">Input</div>
+                      <div className="text-xs font-mono text-slate-700 dark:text-white">{result.usageMetadata.promptTokenCount.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-slate-100 dark:bg-slate-900/50 p-2 rounded-sm border border-slate-200 dark:border-slate-800">
+                      <div className="text-[10px] text-slate-500 font-mono uppercase mb-1">Output</div>
+                      <div className="text-xs font-mono text-brand-600 dark:text-brand-300">{result.usageMetadata.candidatesTokenCount.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-slate-100 dark:bg-slate-900/50 p-2 rounded-sm border border-slate-200 dark:border-slate-800">
+                      <div className="text-[10px] text-slate-500 font-mono uppercase mb-1">Total</div>
+                      <div className="text-xs font-mono text-slate-700 dark:text-white font-bold">{result.usageMetadata.totalTokenCount.toLocaleString()}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {status === GenerationStatus.ERROR && (
+                <div className="text-red-500 dark:text-red-400 text-sm font-mono">Process Failed</div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Input Tile - Spans 12 cols */}
         <div className="col-span-1 md:col-span-12 bg-mosaic-tile border border-mosaic-border p-1 rounded-sm flex flex-col justify-center transition-colors duration-300">
           <form onSubmit={handleSubmit} className="flex flex-col md:flex-row w-full h-full gap-1">
-             <div className="flex-1 bg-slate-100 dark:bg-black/30 flex items-center px-4 py-4 md:py-4 border border-transparent focus-within:border-brand-500/50 transition-colors rounded-sm">
-                <Command className="w-5 h-5 text-slate-400 dark:text-slate-500 mr-3" />
-                <input
-                  type="text"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Enter target URL (e.g., www.example.com)"
-                  className="w-full bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 font-mono text-sm md:text-base"
-                  disabled={status === GenerationStatus.LOADING}
-                />
-             </div>
-             <button
+            <div className="flex-1 bg-slate-100 dark:bg-black/30 flex items-center px-4 py-4 md:py-4 border border-transparent focus-within:border-brand-500/50 transition-colors rounded-sm">
+              <Command className="w-5 h-5 text-slate-400 dark:text-slate-500 mr-3" />
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter target URL (e.g., www.example.com)"
+                className="w-full bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 font-mono text-sm md:text-base"
+                disabled={status === GenerationStatus.LOADING}
+              />
+            </div>
+            <button
               type="submit"
               disabled={status === GenerationStatus.LOADING || !url}
               className={`
@@ -278,19 +278,19 @@ const App: React.FC = () => {
         {/* Result Viewer - Takes Full Width when active */}
         {status === GenerationStatus.SUCCESS && result && (
           <div className="col-span-1 md:col-span-12 animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
-             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                <div className="lg:col-span-3">
-                   <ResultViewer result={result} />
-                </div>
-                <div className="lg:col-span-1 flex flex-col gap-4">
-                   <ImplementationGuide />
-                </div>
-             </div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              <div className="lg:col-span-3">
+                <ResultViewer result={result} />
+              </div>
+              <div className="lg:col-span-1 flex flex-col gap-4">
+                <ImplementationGuide />
+              </div>
+            </div>
           </div>
         )}
 
       </div>
-      
+
       {/* Keyframe for progress bar */}
       <style>{`
         @keyframes progress {

@@ -43,54 +43,64 @@ app.post('/api/generate', async (req, res) => {
         const today = new Date().toISOString().split('T')[0];
         const cleanUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
+        // System Instruction: Defines Persona, Objective, and Rules
+        const systemInstruction = `
+ROLE
+You are the "Strategic AI Brand Architect & GEO Specialist." Your purpose is to transform raw website data into the industry-leading llms.txt standard. Your output is the "Source of Truth" for LLMs.
+
+OBJECTIVE
+Generate a hyper-comprehensive llms.txt file for the target website that maximizes:
+1. CITATION LIKELIHOOD: By providing "Answer-First" snippets.
+2. BRAND POSITIONING: By enforcing specific terminology and unique value props.
+3. DISCOVERABILITY: By mapping every deep-link, feature, and use-case without truncation.
+4. TRACKING & VERSIONING: For AI-Agent performance monitoring.
+
+ARCHITECTURAL RULES (NON-NEGOTIABLE)
+- NO SUMMARIZATION: Do not say "The site covers X." Instead, state "The authoritative resource for X is [URL]."
+- ZERO SHORTCUTS: Never use "..." or "etc." If the input contains 50 features, you list all 50 features.
+- GEO OPTIMIZATION: Use semantic triples (Subject-Predicate-Object) in descriptions to make it easy for LLMs to build internal knowledge graphs.
+- CITATION ANCHORS: Explicitly define how the brand should be cited in AI responses.
+- ABSOLUTE PATHS: All links must be absolute (https://...).
+
+CONTENT HIERARCHY
+1. Brand Identity & Core Positioning: (Who, What, Why, for Whom).
+2. Feature & Capability Index: Comprehensive list of every technical/service capability.
+3. Use-Case & Solution Matrix: Mapping problems to specific page solutions.
+4. Technical Specifications & Interoperability: (APIs, Integrations, Requirements).
+5. Citation & Attribution Guidelines: (The "GEO" secret sauce—how to quote the site).
+6. Detailed Resource Directory: Exhaustive list of all URLs.
+7. Everything else: Any other relevant details.
+
+FORMATTING
+- Ensure the output is valid Markdown.
+- Do NOT include markdown code fences (like \`\`\`markdown) in the final output if possible, or they will be stripped.
+`;
+
+        // User Prompt: Specific Task
         const prompt = `
-      Target Website: ${url}
-      Clean Domain: ${cleanUrl}
-      Current Date: ${today}
+Target Website: ${url}
+Clean Domain: ${cleanUrl}
+Current Date: ${today}
 
-      SEARCH PROTOCOL (MANDATORY)
-      To ensure the output is the "Source of Truth":
-      1. Use the googleSearch tool to explore the ${cleanUrl} domain for features, documentation, pricing, and API details.
-      2. Verify major claims against retrieved content.
+SEARCH PROTOCOL
+To ensure the output is the "Source of Truth":
+1. Use the googleSearch tool to explore the ${cleanUrl} domain.
+2. Specifically look for features, documentation, pricing, and API details.
+3. Verify major claims against retrieved content.
 
-      ROLE
-      You are the "Strategic AI Brand Architect & GEO Specialist." Your purpose is to transform raw website data into the industry-leading llms.txt standard. Your output is the "Source of Truth" for LLMs.
+Generate the definitive llms.txt file now.
+`;
 
-      OBJECTIVE
-      Generate a hyper-comprehensive llms.txt file that maximizes:
-      CITATION LIKELIHOOD: By providing "Answer-First" snippets.
-      BRAND POSITIONING: By enforcing specific terminology and unique value props.
-      DISCOVERABILITY: By mapping every deep-link, feature, and use-case without truncation.
-      TRACKING & VERSIONING: For AI-Agent performance monitoring.
+        console.log("Starting generation with system instructions...");
 
-      ARCHITECTURAL RULES (NON-NEGOTIABLE)
-      NO SUMMARIZATION: Do not say "The site covers X." Instead, state "The authoritative resource for X is [URL]."
-      ZERO SHORTCUTS: Never use "..." or "etc." If the input contains 50 features, you list all 50 features.
-      GEO OPTIMIZATION: Use semantic triples (Subject-Predicate-Object) in descriptions to make it easy for LLMs to build internal knowledge graphs.
-      CITATION ANCHORS: Explicitly define how the brand should be cited in AI responses.
-      ABSOLUTE PATHS: All links must be absolute (https://...).
-
-      CONTENT HIERARCHY
-      Brand Identity & Core Positioning: (Who, What, Why, for Whom).
-      Feature & Capability Index: Comprehensive list of every technical/service capability.
-      Use-Case & Solution Matrix: Mapping problems to specific page solutions.
-      Technical Specifications & Interoperability: (APIs, Integrations, Requirements).
-      Citation & Attribution Guidelines: (The "GEO" secret sauce—how to quote the site).
-      Detailed Resource Directory: Exhaustive list of all URLs.
-      Everything else: Every other that is needed or missed out.
-
-      Retain the content and messagings and positioning that align with the website.
-      Ensure the output is valid Markdown.
-    `;
-
-        console.log("Starting generation...");
         const generateWithRetry = async (retryCount = 0) => {
             try {
                 console.log(`Attempt ${retryCount + 1}...`);
                 return await ai.models.generateContent({
                     model: 'gemini-2.5-flash',
-                    contents: prompt,
+                    contents: prompt, // SDK might treat this as user message
                     config: {
+                        systemInstruction: systemInstruction, // Proper system instruction usage
                         tools: [{ googleSearch: {} }],
                         maxOutputTokens: 8192,
                         temperature: 0.1,
@@ -105,7 +115,7 @@ app.post('/api/generate', async (req, res) => {
             } catch (error) {
                 console.error(`Attempt ${retryCount + 1} failed:`, error.message);
                 if (error.status === 429 && retryCount < 3) {
-                    const delay = Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s
+                    const delay = Math.pow(2, retryCount) * 2000 + (Math.random() * 1000); // jitter
                     console.log(`Rate limit hit. Retrying in ${delay}ms...`);
                     await new Promise(resolve => setTimeout(resolve, delay));
                     return generateWithRetry(retryCount + 1);
@@ -119,6 +129,8 @@ app.post('/api/generate', async (req, res) => {
 
         // Robust text extraction
         let text = "";
+
+        // 1. Try candidates[0].content.parts (most reliable for tools)
         if (response.candidates && response.candidates.length > 0) {
             const candidate = response.candidates[0];
             if (candidate.content && candidate.content.parts) {
@@ -126,7 +138,7 @@ app.post('/api/generate', async (req, res) => {
             }
         }
 
-        // Fallback to helper if manual extraction failed (unlikely)
+        // 2. Helper fallback
         if (!text && typeof response.text === 'function') {
             try { text = response.text(); } catch (e) { console.error("Helper text() failed", e); }
         } else if (!text && response.text) {
@@ -181,5 +193,5 @@ if (!isVercel && (process.env.NODE_ENV === 'production' || process.argv.includes
     });
 }
 
-// Export the app for use in server.js (local) or api/index.js (Vercel)
+// Export the app
 export default app;
