@@ -5,18 +5,22 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from "@google/genai";
 
-// Load environment variables
-dotenv.config({ path: '.env.local' });
+// Load environment variables (silently fail if file missing in production)
+dotenv.config({ path: '.env.local', silent: true });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Health Check
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // API Route
 app.post('/api/generate', async (req, res) => {
@@ -133,8 +137,10 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
-// Serve frontend in production
-if (process.env.NODE_ENV === 'production' || process.argv.includes('--production')) {
+// Serve frontend only if NOT on Vercel (Vercel handles statics via output)
+// and if in production mode or forced via flag
+const isVercel = process.env.VERCEL === '1';
+if (!isVercel && (process.env.NODE_ENV === 'production' || process.argv.includes('--production'))) {
     app.use(express.static(path.join(__dirname, 'dist')));
 
     app.get('*', (req, res) => {
@@ -144,5 +150,3 @@ if (process.env.NODE_ENV === 'production' || process.argv.includes('--production
 
 // Export the app for use in server.js (local) or api/index.js (Vercel)
 export default app;
-
-

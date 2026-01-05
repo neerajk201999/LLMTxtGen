@@ -58,3 +58,4 @@ The easiest way to deploy is to use the [Vercel Platform](https://vercel.com/new
 3. Vercel will automatically detect Vite and set the build command (`npm run build`) and output directory (`dist`).
 4. **Important**: You must add the `GEMINI_API_KEY` environment variable in the Vercel Project Settings.
 5. The `vercel.json` file included in this repo ensures the API works as a serverless function.
+6. **Debug**: You can verify the backend is running by visiting `https://your-app.vercel.app/api/health`.
