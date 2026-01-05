@@ -191,7 +191,7 @@ const App: React.FC = () => {
                     ></div>
                   </div>
                   <div className="flex items-center justify-between text-[10px] font-mono text-brand-600 dark:text-brand-400 uppercase">
-                    <span>Est. Time: ~30-60s (Deep Search Active)</span>
+                    <span>Est. Time: ~45s</span>
                     <div className="flex items-center gap-1">
                       <span className="font-bold">{Math.round(progress)}%</span>
                     </div>

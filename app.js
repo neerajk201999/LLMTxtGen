@@ -142,7 +142,10 @@ if (process.env.NODE_ENV === 'production' || process.argv.includes('--production
     });
 }
 
-// Export the app for use in server.js (local) or api/index.js (Vercel)
+if (process.env.NODE_ENV !== 'production' || process.argv[1] === fileURLToPath(import.meta.url)) {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
 export default app;
-
-

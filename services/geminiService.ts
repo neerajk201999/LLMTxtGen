@@ -11,14 +11,8 @@ export const generateLLMsTxt = async (url: string): Promise<GenerationResult> =>
     });
 
     if (!response.ok) {
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate content');
-      } else {
-        const errorText = await response.text();
-        throw new Error(`Server Error (${response.status}): ${errorText.substring(0, 100)}` || 'Unknown Server Error');
-      }
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to generate content');
     }
 
     return await response.json();
